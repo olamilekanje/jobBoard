@@ -19,6 +19,11 @@ const applicationSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  employer: {  // 🔹 new field
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // reference to employer user
+    required: true
+  },
   resume: {
     type: String, // PDF file path or URL
     required: true

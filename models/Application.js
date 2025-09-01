@@ -1,5 +1,12 @@
-// models/applicationModel.js
 const mongoose = require('mongoose');
+
+const statusSchema = new mongoose.Schema({
+  status: { type: String, enum: ['applied','viewed','shortlisted','rejected','hired'], required: true },
+  by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // who changed it
+  at: { type: Date, default: Date.now },
+  note: String
+});
+
 
 const applicationSchema = new mongoose.Schema({
   job: {
@@ -31,6 +38,7 @@ statusHistory: [
     date: { type: Date, default: Date.now }
   }
 ],
+  currentStatus: { type: String, default: 'applied' },
   appliedAt: {
     type: Date,
     default: Date.now

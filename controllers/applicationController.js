@@ -1,17 +1,18 @@
 const fs = require('fs');
 const path = require('path');
-const Application = require('../models/applicationModel');
+const Application = require('../models/Application');
 const Job = require('../models/Job');
 const sendEmail = require('../utils/mailer');
 
 /// APPLY FOR A JOB
 exports.applyForJob = async (req, res) => {
-  try {
-    const jobId = req.params.jobId;
+try {
+    const { jobId } = req.params;
     const { coverLetter } = req.body;
+    const applicantId = req.user.id;
 
     // ✅ Check if job exists
-    const job = await Job.findById(jobId).populate('postedBy', 'email name');
+    const job = await Job.findById(jobId).populate('createdBy', 'email name');
     if (!job) {
       return res.status(404).json({ message: 'Job not found' });
     }
@@ -46,9 +47,9 @@ exports.applyForJob = async (req, res) => {
 
     // ✅ Send notification email to employer
     await sendEmail(
-      job.postedBy.email,
+      job.createdBy.email,
       `📥 New Application for ${job.title}`,
-      `<p>Hello ${job.postedBy.name},</p>
+      `<p>Hello ${job.createdBy.name},</p>
        <p>${application.applicant.name} has applied for your job posting "<strong>${job.title}</strong>".</p>
        <p>Login to your dashboard to review the application.</p>`
     );

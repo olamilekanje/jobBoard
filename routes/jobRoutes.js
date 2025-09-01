@@ -1,22 +1,25 @@
-const express = require('express');
-const {
-  createJob,
-  getAllJobs,
-  getJobById,
-  updateJob,
-  deleteJob
-} = require('../controllers/jobController');
-const { protect, restrictTo } = require('../middlewares/authMiddleware');
-
+const express = require("express");
 const router = express.Router();
+const { protect, restrictTo } = require("../middlewares/authMiddleware");
+const { createJob, approveJob, getJobs, getAllJobs, updateJob, deleteJob, rejectJob } = require("../controllers/jobController");
 
-// Public routes
-router.get('/', getAllJobs);
-router.get('/:id', getJobById);
+// Employers & Admins can create jobs
+router.post("/create", protect, restrictTo("admin", "employer"), createJob);
 
-// Employer routes
-router.post('/', protect, restrictTo('employer'), createJob);
-router.put('/:id', protect, restrictTo('employer'), updateJob);
-router.delete('/:id', protect, restrictTo('employer'), deleteJob);
+// Admin approves a job
+router.patch("/:id/approve", protect, restrictTo("admin"), approveJob);
+
+router.patch("/:id/reject", protect, restrictTo("admin"), rejectJob);
+// Applicants see only approved jobs
+router.get("/", getJobs);
+
+// Admin dashboard: see all jobs
+router.get("/all", protect, restrictTo("admin"), getAllJobs);
+
+// Update job (admin or employer)
+router.put("/:id", protect, updateJob);
+
+// Delete job (admin only)
+router.delete("/:id", protect, deleteJob);
 
 module.exports = router;
